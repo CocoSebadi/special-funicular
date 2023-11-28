@@ -44,7 +44,7 @@ def main():
             assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit","Internal Audit","GSA"])
             due_date = st.date_input("Due Date")
             financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
-            risk_event_type = st.text_input("Type of Risk Event")
+        
 
         elif issue_action == "Update an Existing Issue":
             st.write("You chose to update an existing issue.")
