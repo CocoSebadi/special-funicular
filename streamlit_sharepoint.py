@@ -1,12 +1,43 @@
 import streamlit as st
+import sys
+sys.path.append('.')
+import psycopg2  # Required for Psycopg2 to work with Streamlit
+import pandas as pd  # Optional, but commonly used for data manipulation
+from sqlalchemy import create_engine  # Optional, for more abstract database interactions
+import bcrypt  # Optional, for password hashing
+from passlib.hash import pbkdf2_sha256  # Optional, another library for password hashing
 import random
 import string
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import logging
-from backend import PostgreSQLDatabase
+from PostgreSQLDatabase import PostgreSQLDatabase
+from config import Config
+import app_logic
+from app_logic import AppLogic
 
+# Access configurations
+database_config = Config.DB_CONFIG
+powerbi_config = Config.POWERBI_CONFIG
+streamlit_config = Config.STREAMLIT_CONFIG
+api_key = Config.API_KEY
+secret_key = Config.SECRET_KEY
+
+# Connection parameters for your PostgreSQL database
+connection_params = {
+    'host': 'localhost',
+    'database': 'sharepoint',
+    'user': 'postgres',
+    'password': 'Mkw@naz1',
+    'port': '5432',
+}
+
+# Create an instance of the PostgreSQLDatabase class
+db = PostgreSQLDatabase(connection_params)
+
+# Initialize the database
+db.initialize_database()
 
 def generate_password():
     # Define the pool of characters for the password
@@ -17,6 +48,7 @@ def generate_password():
 
     return password
 
+# Function to check if the username is valid
 def is_valid_username(username):
     # Check if the username starts with 'ab' and has additional alphanumeric characters
     return username.startswith('ab') and username[2:].isalnum()
@@ -126,7 +158,9 @@ def main_page(db):
             issue_data = {
                 "name": issue_name,
                 "description": issue_description,
+                "issue_Status": issue_Status,
                 "risk_type": risk_type,
+                "subrisk_type": subrisk_type,
                 "entities": entity_dropdown,
                 "bu_rating": bu_rating,
                 "agl_rating": agl_rating,
