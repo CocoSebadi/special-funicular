@@ -36,7 +36,7 @@ def main():
             issue_name = st.text_input("Issue Name")
             issue_description = st.text_area("Issue Description", "")
             issue_Status = st.selectbox("Issue Status",["Open","Closed","Risk Accepted","Overdue","DWB"])
-            risk_type = st.selectbox("Risk Type",["Operational & Rislience Risk","Insurance risk type","Compliance Risk","Model Risk","Conduct Risk"])
+            Principle_risk_type = st.selectbox("Principle_risk_type",["Operational & Rislience Risk","Insurance risk type","Compliance Risk","Model Risk","Conduct Risk"])
             subrisk_type = st.selectbox("Subrisk Type",["Model Uncertainty Risk","Process Management Risk","Supplier Risk","Technology Risk","Transaction Processing and Management Risk","Underwriting Risk","Anti-Money Laundering","Business Continuity Risk","Change Risk","Conduct Risk","Customer Engagement Risk","Data and Records Management Risk","Fraud Risk","Information Security and Cyber Risk","Insurance Exposure Risk"])
             entity_dropdown = st.selectbox("Entity", ["FAK","ALAK","LIFESA","ALB","ALZ","NBFS","AIC", "GAM","IDIRECT","INSTANT LIFE","AL"])
             bu_rating = st.selectbox("BU Rating", ["Limited", "Major", "Moderate","Critical"])
