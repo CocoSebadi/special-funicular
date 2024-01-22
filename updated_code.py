@@ -63,11 +63,8 @@ def main():
 
     elif issue_action == "Update an Existing Issue":
      st.write("You chose to update an existing issue.")
-
-
-            # Show consolidated open issues in a table
+        
      st.subheader("Consolidated Open Issues:")
-     st.table(open_issues_df)
      uploaded_file = st.file_uploader("Upload an existing issues tracker file", type=["csv", "xlsx"])
 
     if uploaded_file is not None:
