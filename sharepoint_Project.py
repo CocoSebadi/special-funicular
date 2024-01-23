@@ -67,8 +67,8 @@ def main():
 
                 else:
                     st.warning("Please upload an existing issues tracker file.")
-            else:
-                st.error("Login failed. Please try again.")
+        else:
+            st.error("Login failed. Please try again.")
 
 if __name__ == "__main__":
     main()
