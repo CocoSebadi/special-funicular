@@ -6,7 +6,7 @@ def calculate_reminder_date(due_date):
     return due_date - timedelta(days=3 * 30)
 
 def validate_employee_number(employee_number):
-    valid_employee_numbers = ["emp123", "emp456", "emp789"]  
+    valid_employee_numbers = ["emp1237", "emp456", "emp789"]  
     return employee_number in valid_employee_numbers
 
 # Login Section
@@ -95,7 +95,8 @@ def main():
         if st.button("Submit"):
             st.success("Form submitted successfully!")
 
-
+ else:
+    st.error("Login failed. Please try again.")
 
 if __name__ == "__main__":
     main()
