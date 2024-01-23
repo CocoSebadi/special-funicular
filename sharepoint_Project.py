@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 class SessionState:
     def __init__(self, **kwargs):
@@ -8,10 +7,7 @@ class SessionState:
 
 # Placeholder authentication logic
 def authenticate(username, password):
-    if username == "demo" and password == "password":
-        return True
-    else:
-        return False
+    return username == "demo" and password == "password"
 
 # Function to get or create the session state
 def get_session():
@@ -43,13 +39,9 @@ def main():
 
             if issue_action == "Log a New Issue":
                 st.write("You chose to log a new issue.")
-
                 # Add form elements for logging a new issue
                 issue_name = st.text_input("Issue Name")
                 issue_description = st.text_area("Issue Description", "")
-                issue_status = st.selectbox("Issue Status", ["Open", "Closed", "Risk Accepted", "Overdue"])
-                risk_type = st.selectbox("Risk Type", ["Operational & Resilience Risk", "Insurance risk type", "Compliance Risk", "Model Risk", "Conduct Risk"])
-                # Add other form elements
 
                 if st.button("Submit"):
                     # Handle form submission logic here
@@ -62,26 +54,12 @@ def main():
 
                 if uploaded_file is not None:
                     # Read the uploaded file into a DataFrame
-                    existing_issues_df = pd.read_csv(uploaded_file)  # Adjust the reading logic based on the file type
-                    st.write("Existing Issues Tracker Loaded:")
-                    st.write(existing_issues_df)
-
-                    # Allow the user to select the issue they want to update
-                    selected_issue_id = st.selectbox("Select the Issue to Update", existing_issues_df['Issue ID'])
-
-                    # Additional form elements for updating an existing issue
-                    issue_owner = st.text_input("Issue Owner")
-                    original_date = st.date_input("Original Date")
-                    revised_due_date = st.date_input("Revised Due Date")
-                    bu_rating_update = st.text_input("BU Rating Update")
-
-                    # File attachment or written evidence for the update
-                    attachment = st.file_uploader("Attach a File or Provide Written Evidence", type=["pdf", "docx"])
+                    st.success("Existing Issues Tracker Loaded!")
+                    st.write(pd.read_csv(uploaded_file))  # Adjust the reading logic based on the file type
 
                     if st.button("Submit"):
                         # Handle form submission logic here
                         st.success("Form submitted successfully!")
-
                 else:
                     st.warning("Please upload an existing issues tracker file.")
 
