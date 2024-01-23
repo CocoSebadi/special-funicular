@@ -81,21 +81,22 @@ def main():
                 issue_owner_email = st.text_input("Issue Owner Email Address")
                 financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
 
-                # Calculate the reminder date (3 months before the due date)
-                reminder_date = due_date - timedelta(days=3 * 30)
+                # Calculate the reminder date (3 months before the due date) if due_date is not None
+                if due_date is not None:
+                    reminder_date = due_date - timedelta(days=3 * 30)
 
-                # Check if it's time to send the reminder
-                current_date = datetime.now()
-                if current_date >= reminder_date:
-                    # Send the reminder email
-                    subject = f"Reminder: Upcoming Issue Due Date - {issue_name}"
-                    body = f"Dear {issue_owner_name},\n\nThis is a reminder that the issue '{issue_name}' is due on {due_date}. " \
-                           f"I trust this email finds you well. I wanted to bring to your attention that the deadline for resolving " \
-                           f"the current issue is fast approaching. As part of the resolution process, we kindly request you to " \
-                           f"compile an Incident Closure Plan (ICP) using the specified ICP format."
-                    send_email(issue_owner_email, subject, body)
+                    # Check if it's time to send the reminder
+                    current_date = datetime.now()
+                    if current_date >= reminder_date:
+                        # Send the reminder email
+                        subject = f"Reminder: Upcoming Issue Due Date - {issue_name}"
+                        body = f"Dear {issue_owner_name},\n\nThis is a reminder that the issue '{issue_name}' is due on {due_date}. " \
+                               f"I trust this email finds you well. I wanted to bring to your attention that the deadline for resolving " \
+                               f"the current issue is fast approaching. As part of the resolution process, we kindly request you to " \
+                               f"compile an Incident Closure Plan (ICP) using the specified ICP format."
+                        send_email(issue_owner_email, subject, body)
 
-                    st.write(f"Reminder email sent to {issue_owner_email} on {reminder_date}")
+                        st.write(f"Reminder email sent to {issue_owner_email} on {reminder_date}")
 
                 # Add a button to submit the form
                 if st.button("Submit"):
