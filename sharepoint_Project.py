@@ -63,7 +63,7 @@ def main():
             issue_owner = st.text_input("Issue Owner")
             original_date = st.date_input("Original Date")
             revised_due_date = st.date_input("Revised Due Date")
-            bu_rating_update = st.text_input("BU Rating Update")
+           
 
             # File attachment or written evidence for the update
             attachment = st.file_uploader("Attach a File or Provide Written Evidence", type=["pdf", "docx"])
