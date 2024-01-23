@@ -43,6 +43,8 @@ def main():
             agl_rating = st.selectbox("AGL Rating", ["Limited", "Major", "Moderate","Critical"])
             assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit","Internal Audit","GSA"])
             due_date = st.date_input("Due Date")
+            issue_owner_name = st.text_input("Issue Owner Name")
+            issue_owner_email = st.text_input("Issue Owner Email Address")
             financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
         
 
