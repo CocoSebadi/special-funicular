@@ -20,15 +20,6 @@ def main():
         # Show a pop-up message for choosing to log a new issue or update an existing issue
         issue_action = st.radio("Select an action:", ["Log a New Issue", "Update an Existing Issue"])
 
-        # Placeholder DataFrame for consolidated open issues
-        open_issues_data = {
-            'Issue ID': [1, 2, 3, 4],
-            'Issue Owner': ['John', 'Jane', 'Bob', 'Mary'],
-            'Original Date': ['2022-01-01', '2022-02-01', '2022-03-01', '2022-05-01'],
-            'Revised Due Date': ['2022-02-01', '2022-03-01', '2022-04-01', '2022-06-01'],
-            'BU Rating': ['Limited', 'Major', 'Moderate','Critical']
-        }
-        open_issues_df = pd.DataFrame(open_issues_data)
 
         if issue_action == "Log a New Issue":
             st.write("You chose to log a new issue.")
@@ -70,6 +61,7 @@ def main():
         # Add a button to submit the form
         if st.button("Submit"):
             st.success("Form submitted successfully!")
+           
 
     else:
         st.error("Login failed. Please try again.")
