@@ -41,7 +41,7 @@ def main():
             entity_dropdown = st.selectbox("Entity", ["FAK","ALAK","LIFE SA","ALB","ALZ","NBFS: SPM","NBFS :WILLS TRUST AND ESTATES","NBFS:AIFA","AIC", "GAM"])
             BU_risk_rating = st.selectbox("BU risk Rating", ["Limited", "Major", "Moderate","Critical"])
             agl_rating = st.selectbox("AGL Rating", ["Limited", "Major", "Moderate","Critical"])
-            assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit","Internal Audit","GSA"])
+            assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk","Other","Risk Assurance- 2LoD Risk","External Audit- 3LoD Risk","Internal Audit -3LoD Risk","Compliance M&T","GSA"])
             due_date = st.date_input("Due Date")
             issue_owner_name = st.text_input("Issue Owner Name")
             issue_owner_email = st.text_input("Issue Owner Email Address")
