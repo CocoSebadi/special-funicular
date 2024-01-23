@@ -39,7 +39,7 @@ def main():
             financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
         
 
-       elif issue_action == "Update an Existing Issue":
+    elif issue_action == "Update an Existing Issue":
      st.write("You chose to update an existing issue.")
      st.subheader("Consolidated Open Issues:")
      uploaded_file = st.file_uploader("Upload an existing issues tracker file", type=["csv", "xlsx"])
