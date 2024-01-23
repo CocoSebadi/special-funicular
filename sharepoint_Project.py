@@ -35,7 +35,7 @@ def main():
             # Add form elements for logging a new issue
             issue_name = st.text_input("Issue Name")
             issue_description = st.text_area("Issue Description", "")
-            issue_Status = st.selectbox("Issue Status",["Open","Closed","Risk Accepted","Overdue","DWB"])
+            issue_Status = st.selectbox("Issue Status",["Open","Closed","Risk Accepted","Overdue"])
             Principle_risk_type = st.selectbox("Principle_risk_type",["Operational & Rislience Risk","Insurance risk type","Compliance Risk","Model Risk","Conduct Risk"])
             subrisk_type = st.selectbox("Subrisk Type",["Model Uncertainty Risk","Process Management Risk","Supplier Risk","Technology Risk","Transaction Processing and Management Risk","Underwriting Risk","Anti-Money Laundering","Business Continuity Risk","Change Risk","Conduct Risk","Customer Engagement Risk","Data and Records Management Risk","Fraud Risk","Information Security and Cyber Risk","Insurance Exposure Risk"])
             entity_dropdown = st.selectbox("Entity", ["FAK", "ALAK", "LIFE SA", "ALB", "ALZ", "NBFS: SPM", "NBFS: WILLS TRUST AND ESTATES", "NBFS: AIFA", "AIC", "GAM"])
