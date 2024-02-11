@@ -76,7 +76,7 @@ def set_custom_theme():
 
 # Streamlit app layout with custom theme
 set_custom_theme()
-st.title("Project Issues Form")
+st.title("Issue Tracker App")
 st.image("absa logo.png", use_column_width=True)  # Add company logo
 
 #
