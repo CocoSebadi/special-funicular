@@ -202,6 +202,9 @@ def main():
             assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit", "Internal Audit", "GSA"])
             due_date = st.date_input("Due Date")
             financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
+            financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
+             # Add checkboxes for indicating the issue level
+            issue_level = st.radio("Is the issue at the Group Level or PSC Level?", ["Group Level", "PSC Level"])
 
             # Check the user's choice
             if financially_implicated == "Yes":
