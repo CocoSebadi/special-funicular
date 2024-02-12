@@ -2,9 +2,11 @@ import streamlit as st
 import sqlite3
 from hashlib import sha256
 import pandas as pd
-#from auth import sign
 import random 
 import psycopg2
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 ##PosGreSQL
 params = {
@@ -26,19 +28,18 @@ CURSOR=connection.cursor()
 
 # function to view current issues
 def view_all_issues():
-    CURSOR.execute('SELECT * FROM  issues')
+    CURSOR.execute('SELECT * FROM  issues2024')
     data = CURSOR.fetchall()
     return data
 
 
 # function to view current issues status
 def view_all_issues_status():
-    CURSOR.execute('SELECT issue_status FROM  issues')
+    CURSOR.execute('SELECT issue_status FROM  issues2024')
     data = CURSOR.fetchall()
     return data
 
 df_status=pd.DataFrame(view_all_issues_status(),columns=['Issue_Status'])
-# Function to create a table for  new user
 # Function to create a table for  new user
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -56,6 +57,10 @@ def signup(username, password):
     conn.close()
 
 #
+# Function to execute SQL queries
+def execute_query(query):
+    CURSOR.execute(query)
+    connection.commit()
 # Function to log in a user
 def login(username, password):
     conn = get_db_connection()
@@ -68,9 +73,33 @@ def login(username, password):
     conn.close()
     return user
 
+#Custom Streamlit theme
+def set_custom_theme():
+    st.markdown(
+        """
+        <style>
+            body {
+                background-color: red; /* Change theme background color to red */
+            }
+            .css-1poyekb {
+                background-color: red; /* Change theme color to red */
+                color: #f0f2f6;
+            }
+            .element-container img {
+                max-width: 80%; /* Resize logo image to appear smaller */
+            }
+            .title-centered {
+            text-align: center; /* Align title to the center */
+            }
+            </style>
+            """,
+        unsafe_allow_html=True
+    )
 
-
-
+# Streamlit app layout with custom theme
+set_custom_theme()
+st.title("Issue Tracker App")
+st.image("absa1502.jpg", use_column_width=True)  # Add company logo
 
 
 # # Function to create the issues table
@@ -117,7 +146,7 @@ def generate_unique_code():
  
 def is_code_exists(code):
     #Check if the code exists in the 'issues' table
-    CURSOR.execute("SELECT COUNT(*) FROM issues WHERE issue_code = ?", (code,))
+    CURSOR.execute("SELECT COUNT(*) FROM issues2024 WHERE issue_code = %s", (code,))
     count = CURSOR.fetchone()[0]
     return count > 0
     
@@ -127,7 +156,6 @@ def is_code_exists(code):
 # Streamlit UI
 def main():
     
-
     st.title("Issue Tracker App")
 
     # Sidebar
@@ -135,7 +163,7 @@ def main():
     if page=='View Current Issues':
        
 
-        df=pd.DataFrame(view_all_issues(),columns=["ID",'issue_code','name',' description','issue_status','risk_type','subrisk_type','entities','bu_rating','agl_rating','assurance_provider','due_date','financially_implicated','risk_event_type',' additional_evidence',' file_contents','issuer_name','issuer_surname','issuer_email','username'])
+        df=pd.DataFrame(view_all_issues(),columns=["ID",'issue_code','issue_name',' description','issue_status','risk_type','subrisk_type','entities','bu_rating','agl_rating','assurance_provider','due_date','review_name','financially_implicated','risk_event_type','issuer_name','issuer_surname','issuer_email','username'])
         dffiltered=st.text_input("...")
         df_fil=df[df['issue_code']==dffiltered]
         src_btn=st.button("Search")
@@ -168,17 +196,18 @@ def main():
         st.header("Log Issue")
         if st.session_state.get('username'):
             issue_code = st.text_input("Issue Code (4 characters)")
-            issue_name = st.text_input("Name")
+            review_name = st.text_area("Review Name")
+            issue_name = st.text_input("Issue Name")
             description = st.text_area("Description")
             issue_status =st.selectbox("Issue Status", ["Open", "Closed", "Risk Accepted", "Overdue"])
             risk_type = st.selectbox("Risk Type", ["Operational & Resilience Risk", "Insurance risk type", "Compliance Risk", "Model Risk", "Conduct Risk"])
             subrisk_type = st.selectbox("Subrisk Type", ["Model Uncertainty Risk", "Process Management Risk", "Supplier Risk", "Technology Risk", "Transaction Processing and Management Risk", "Underwriting Risk", "Anti-Money Laundering", "Business Continuity Risk", "Change Risk", "Conduct Risk", "Customer Engagement Risk", "Data and Records Management Risk", "Fraud Risk", "Information Security and Cyber Risk", "Insurance Exposure Risk"])
+            entities = st.selectbox("Entity Name", ["FAK", "ALAK", "LIFE SA", "ALB", "ALZ", "NBFS: SPM", "NBFS: WILLS TRUST AND ESTATES", "NBFS: AIFA", "AIC", "GAM"])
             bu_rating = st.selectbox("BU Rating", ["Limited", "Major", "Moderate", "Critical"])
             agl_rating = st.selectbox("AGL Rating", ["Limited", "Major", "Moderate", "Critical"])
-            assurance_provider_dropdown = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit", "Internal Audit", "GSA"])
+            assurance_provider = st.selectbox("Assurance Provider", ["2LOD Risk", "External Audit", "Internal Audit", "GSA"])
             due_date = st.date_input("Due Date")
             financially_implicated = st.radio("Does the issue have a financial implication?", ["Yes", "No"])
-
             # Check the user's choice
             if financially_implicated == "Yes":
                 # Prompt the user to upload a financial statement
@@ -192,7 +221,8 @@ def main():
                 st.info("No financial implications. Proceed with other actions.")
             issuer_name = st.text_input("Issuer Name")
             issuer_surname = st.text_input("Issuer surname")
-            issuer_email = st.text_input("Issuer Email Address")
+            issuer_email = st.text_input("Issuer Email Address")    
+
             # e... Add other input fields for the remaining columns
             # File attachment option for various types
             uploaded_file = st.file_uploader("Attach a File (if applicable)", type=["pdf", "jpg", "png", "txt", "csv", "xlsx"])
@@ -225,8 +255,25 @@ def main():
                             if issue_status != "Open":
                                 st.warning("The issue status must be 'Open' to log a new issue. Please correct the issue status.")
             else:
-                log_issue(issue_code, issue_name, description,issue_status,risk_type,subrisk_type, bu_rating ,agl_rating,assurance_provider_dropdown, due_date,financially_implicated,issuer_name,issuer_surname,issuer_email,st.session_state.username)
-                st.success("Issue logged successfully!")
+                
+                log_issue(issue_code, issue_name, description, issue_status,risk_type,subrisk_type,entities, bu_rating,agl_rating,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,review_name,st.session_state.username)
+                # Function to send email
+                def send_email(subject, message):
+                    sender_email = "your_email@gmail.com"  # Add your sender email address
+                    receiver_email = "recipient_email@example.com"  # Add recipient email address
+                    password = "your_password"  # Add your email password
+                
+                    msg = MIMEMultipart()
+                    msg['From'] = sender_email
+                    msg['To'] = receiver_email
+                    msg['Subject'] = subject
+                    msg.attach(MIMEText(message, 'plain'))
+                
+                    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                        server.starttls()
+                        server.login(sender_email, password)
+                        server.sendmail(sender_email, receiver_email, msg.as_string())
+                        st.success("Issue logged successfully!")
         else:
             st.warning("Please login to log an issue.")
 
@@ -242,41 +289,39 @@ def main():
         # else:
         #     #st.table(df.tail(5))
         #     st.data_editor(df)
-        df=pd.DataFrame(view_all_issues(),columns=["ID",'issue_code','name',' description','issue_status','risk_type','subrisk_type','entities','bu_rating','agl_rating','assurance_provider','due_date','financially_implicated','risk_event_type',' additional_evidence',' file_contents','issuer_name','issuer_surname','issuer_email','username'])
+        df=pd.DataFrame(view_all_issues(),columns=['ID','issue_code','review_name','issue_name', 'description','A', 'issue_status','risk_type','subrisk_type','entities', 'bu_rating','agl_rating','assurance_provider', 'due_date','financially_implicated','issuer_name','issuer_surname', 'issuer_email','username'])
+        st.write(df)
         dffiltered=st.text_input("...")
         df_fil=df[df['issue_code']==dffiltered]
         src_btn=st.button("Search")
         if src_btn==True:
-            st.data_editor(df_fil)
+            st.table(df_fil)
         else:
-            st.data_editor(df.tail(5))
-
-        if st.checkbox("Updated Description"):
-            if st.session_state.get('username'):
-                issue_id = st.text_input("Enter Issue ID")
-                new_issue = st.text_area("Describe the updated issue",key=30)
-                if st.button("Update Issue"):
-                    update_issue(issue_id, new_issue)
-                    st.success("Issue updated successfully!")
-
-            if st.checkbox("Updated Issue Status"):
-                if st.session_state.get('username'):
-                    issue_id = st.text_input("Enter Issue ID",key='id')
-                    new_issue =st.selectbox("Status",options=["Open", "Closed", "Risk Accepted", "Overdue"]) #st.text_area("Describe the updated issue",key=20)
-                    if st.button("Update Issue Status"):
-                        update_issue_status(issue_id, new_issue)
-                        st.success("Issue updated successfully!")
-            else:
-                st.warning("Please login to update an issue.")
+            st.table(df.tail(5))
+        # Example: Update a row in a table
+        st.header('Update a Row')
+        #table_name = st.text_input('Enter the table name:')
+        column_to_update = st.text_input('Enter the column name to update:')
+        new_value = st.text_input('Enter the new value:')
+        condition_column = st.text_input('Enter the column name for the condition:')
+        condition_value = st.text_input('Enter the value for the condition:')
+        
+        if st.button('Update Row'):
+            query = f"UPDATE issues2024 SET {column_to_update} = '{new_value}' WHERE {condition_column} = '{condition_value}';"
+            execute_query(query)
+            st.success(f'Row updated successfully in table Issues.')
+      
+            
+        
 
 # Function to log an issue
-def log_issue(issue_code, issue_name, description, issue_status,risk_type,subrisk_type, bu_rating,agl_rating,assurance_provider,due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,username):
+def log_issue(issue_code,review_name, issue_name, description, issue_status,risk_type,entities,subrisk_type, bu_rating,agl_rating,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,username):
 
     CURSOR.execute('''
-        INSERT INTO issues (
-            issue_code,name, description,issue_status,risk_type,subrisk_type,bu_rating,agl_rating ,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,username
-        ) VALUES (%s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    ''', (issue_code, issue_name, description, issue_status,risk_type,subrisk_type, bu_rating,agl_rating,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,username))
+        INSERT INTO issues2024 (
+            issue_code,issue_name, description, issue_status,risk_type,subrisk_type,entities, bu_rating,agl_rating,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,review_name,username
+        ) VALUES (%s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    ''', (issue_code, issue_name, description, issue_status,risk_type,subrisk_type,entities, bu_rating,agl_rating,assurance_provider, due_date,financially_implicated,issuer_name,issuer_surname, issuer_email,review_name,username))
 
     connection.commit()
     connection.close()
@@ -307,7 +352,7 @@ def update_issue_status(issue_id, new_issue):
     conn = create_connection()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE issues SET issue_status=? WHERE id=?", (new_issue, issue_id))
+    cursor.execute("UPDATE issues SET issue_status=%s WHERE id=%s", (new_issue, issue_id))
 
     conn.commit()
     conn.close()
